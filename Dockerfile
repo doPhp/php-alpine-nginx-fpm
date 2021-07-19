@@ -22,8 +22,8 @@ RUN apk --no-cache add \
   php8-session \
   php8-xml \
   php8-xmlreader \
-  php8-zlib
-#  supervisor
+  php8-zlib \
+  supervisor
 
 # Create symlink so programs depending on `php` still function
 RUN ln -s /usr/bin/php8 /usr/bin/php
@@ -36,7 +36,7 @@ COPY config/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
 COPY config/php.ini /etc/php8/conf.d/custom.ini
 
 # Configure supervisord
-#COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Setup document root
 RUN mkdir -p /var/www/html
@@ -58,7 +58,7 @@ COPY --chown=nobody src/ /var/www/html/
 EXPOSE 8080
 
 # Let supervisord start nginx & php-fpm
-#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # Configure a healthcheck to validate that everything is up&running
 HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
